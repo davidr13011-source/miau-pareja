@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Miau & Tú · Juego para parejas</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEE9FF;--card:#fff;--ink:#2B2350;--soft:#6B6394;--pink:#FF8FAB;--gold:#FFD166;--teal:#4FBFAE;--line:#D8D0F5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1E1A3A;--card:#2B2550;--ink:#F5F1FF;--soft:#B5ABDD;--line:#443C7A}}
+:root[data-theme="dark"]{--bg:#1E1A3A;--card:#2B2550;--ink:#F5F1FF;--soft:#B5ABDD;--line:#443C7A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:17px;line-height:1.5;min-height:100vh}
+h1,h2,h3,.btn{font-family:Fredoka,Nunito,system-ui,sans-serif}
+main{max-width:560px;margin:0 auto;padding:20px 18px 40px;text-align:center}
+.cat{width:150px;height:130px;margin:8px auto 0;display:block;overflow:visible}
+.cat .tail{transform-origin:20px 100px;animation:wag 2.4s ease-in-out infinite}
+.cat .eye{transform-origin:center;transform-box:fill-box;animation:blink 4s infinite}
+@keyframes wag{50%{transform:rotate(14deg)}}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+@media (prefers-reduced-motion:reduce){.cat .tail,.cat .eye{animation:none}}
+h1{font-size:2.3rem;line-height:1.1;margin:10px 0 6px}
+h2{font-size:1.45rem;line-height:1.25;margin:6px 0 14px}
+p{margin:0 0 14px;color:var(--soft)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:28px;padding:22px 18px;margin-top:14px;text-align:left}
+.card.center{text-align:center}
+input{width:100%;font:inherit;font-weight:700;padding:13px 16px;margin:0 0 12px;border-radius:16px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+input:focus,.btn:focus-visible,.opt:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.btn{font-size:1.1rem;font-weight:700;border:0;border-radius:999px;padding:13px 28px;background:var(--pink);color:#3A1230;cursor:pointer;box-shadow:0 4px 0 #D9688A;transition:transform .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #D9688A}
+.btn.alt{background:var(--gold);box-shadow:0 4px 0 #D9A92F;color:#3B2D00}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-size:.95rem}
+.pill{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:4px 14px}
+.bar{height:10px;background:var(--line);border-radius:99px;margin:10px 0 0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal);border-radius:99px;transition:width .4s}
+.tag{display:inline-block;background:var(--gold);color:#3B2D00;border-radius:99px;padding:2px 12px;font-weight:700;font-size:.85rem;margin-bottom:10px}
+.opts{display:grid;gap:10px;margin-top:6px}
+.opt{font:inherit;font-weight:700;text-align:left;padding:14px 16px;border-radius:18px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}
+.opt:hover:not([disabled]){border-color:var(--pink)}
+.opt.sel{border-color:var(--pink);background:color-mix(in srgb,var(--pink) 25%,var(--bg))}
+.opt.ok{border-color:var(--teal);background:color-mix(in srgb,var(--teal) 30%,var(--bg))}
+.opt.no{border-color:#E0607E;background:color-mix(in srgb,#E0607E 22%,var(--bg))}
+.paws{font-size:1.6rem;letter-spacing:4px}
+.who{font-weight:700;color:var(--pink)}
+.hide{display:none}
+.score{display:flex;gap:10px;justify-content:center;margin-top:14px}
+.score div{flex:1;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:10px}
+.score b{font-family:Fredoka,sans-serif;font-size:1.8rem;display:block}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tab{flex:1;font:inherit;font-weight:700;font-size:.95rem;padding:9px 4px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.tab.on{background:var(--gold);color:#3B2D00;border-color:var(--gold)}
+.code{font-family:Fredoka,sans-serif;font-size:3rem;letter-spacing:8px;background:var(--card);border:3px dashed var(--pink);border-radius:24px;padding:8px 8px 8px 16px;margin:10px 0}
+label{display:block;text-align:left}
+#msg{margin:12px 0 0;min-height:1.4em;font-size:.95rem;text-align:center}
+</style>
+</head>
+<body>
+<main>
+<svg class="cat" id="cat" viewBox="0 0 150 130" aria-hidden="true">
+  <path class="tail" d="M112 100 Q150 90 138 50" fill="none" stroke="#FFB86B" stroke-width="12" stroke-linecap="round"/>
+  <path d="M30 50 L34 12 L62 34Z M120 50 L116 12 L88 34Z" fill="#FFB86B"/>
+  <path d="M38 40 L40 22 L54 34Z M112 40 L110 22 L96 34Z" fill="#FF8FAB"/>
+  <ellipse cx="75" cy="72" rx="52" ry="44" fill="#FFB86B"/>
+  <path d="M75 30 v14 M62 32 l3 11 M88 32 l-3 11" stroke="#E88F3A" stroke-width="5" stroke-linecap="round"/>
+  <ellipse class="eye" cx="55" cy="68" rx="6" ry="8" fill="#2B2350"/>
+  <ellipse class="eye" cx="95" cy="68" rx="6" ry="8" fill="#2B2350"/>
+  <circle cx="57" cy="65" r="2" fill="#fff"/><circle cx="97" cy="65" r="2" fill="#fff"/>
+  <ellipse cx="44" cy="82" rx="8" ry="5" fill="#FF8FAB" opacity=".6"/><ellipse cx="106" cy="82" rx="8" ry="5" fill="#FF8FAB" opacity=".6"/>
+  <path d="M71 80 h8 l-4 5z" fill="#E0607E"/>
+  <path id="mouth" d="M75 85 Q69 94 62 89 M75 85 Q81 94 88 89" fill="none" stroke="#2B2350" stroke-width="3" stroke-linecap="round"/>
+  <path d="M28 76 l-20 -4 M28 84 l-20 4 M122 76 l20 -4 M122 84 l20 4" stroke="#2B2350" stroke-width="2" stroke-linecap="round"/>
+</svg>
+
+<!-- Inicio -->
+<section id="s-home">
+  <h1>Miau &amp; Tú</h1>
+  <p>Un juego de gatitos para descubrir cuánto se conocen. Una persona responde, la otra adivina.</p>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab on" data-m="local">Un celular</button>
+      <button class="tab" data-m="host">Crear sala</button>
+      <button class="tab" data-m="join">Unirme</button>
+    </div>
+    <label for="n1" class="who" id="l1">Jugador/a 1</label>
+    <input id="n1" maxlength="14" placeholder="Tu nombre" autocomplete="off">
+    <div id="w2"><label for="n2" class="who">Jugador/a 2</label>
+    <input id="n2" maxlength="14" placeholder="El nombre de tu pareja" autocomplete="off"></div>
+    <div id="wc" class="hide"><label for="code" class="who">Código de la sala</label>
+    <input id="code" maxlength="4" placeholder="ABCD" autocomplete="off" style="text-transform:uppercase"></div>
+    <div style="text-align:center;margin-top:6px"><button class="btn" id="start">Empezar a jugar</button></div>
+    <p id="msg"></p>
+  </div>
+  <p style="margin-top:16px;font-size:.92rem">Con dos celulares: una persona crea la sala y la otra entra con el código. Las dos deben abrir este mismo enlace con su sesión de Claude iniciada.</p>
+</section>
+
+<!-- Sala de espera -->
+<section id="s-lobby" class="hide">
+  <h2 id="lobbyT">Sala creada</h2>
+  <div class="code" id="codeT"></div>
+  <p id="lobbyP"></p>
+</section>
+
+<!-- Juego -->
+<section id="s-game" class="hide">
+  <div class="top"><span class="pill" id="prog"></span><span class="pill" id="sc"></span></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="card" id="box"></div>
+  <div style="text-align:center;margin-top:18px"><button class="btn" id="next"></button></div>
+</section>
+
+<!-- Final -->
+<section id="s-end" class="hide">
+  <h1 id="endT"></h1>
+  <p id="endP"></p>
+  <div class="paws" id="endPaws"></div>
+  <div class="score" id="endS"></div>
+  <div style="margin-top:22px"><button class="btn" id="again">Jugar otra vez</button></div>
+</section>
+</main>
+
+<script>
+const Q=[
+{c:"Comida",q:"¿Cuál es tu comida favorita para una noche en casa?",o:["Pizza","Pasta","Sushi","Tacos o hamburguesa"]},
+{c:"Comida",q:"¿Qué postre elegirías siempre?",o:["Helado","Chocolate","Pastel o tarta","Frutas"]},
+{c:"Comida",q:"¿Con qué bebida te quedas?",o:["Café","Té","Jugo o batido","Refresco"]},
+{c:"Comida",q:"¿Desayuno ideal de domingo?",o:["Algo dulce","Algo salado","Solo café","No desayuno, ¡brunch!"]},
+{c:"Gustos",q:"¿Qué tipo de película prefieres?",o:["Comedia","Romance","Terror o suspenso","Ciencia ficción o acción"]},
+{c:"Gustos",q:"¿Qué música pones para sentirte bien?",o:["Pop","Rock","Reguetón o urbano","Baladas o indie"]},
+{c:"Gustos",q:"¿Cuál es tu color favorito?",o:["Rosa o morado","Azul o verde","Negro o gris","Amarillo o naranja"]},
+{c:"Gustos",q:"¿Qué animal te gusta más (además de los gatos)?",o:["Perros","Aves","Animales marinos","Animales exóticos"]},
+{c:"Planes",q:"¿Plan perfecto para el fin de semana?",o:["Maratón de series","Salir a pasear","Fiesta con amigos","Siesta y nada más"]},
+{c:"Planes",q:"¿Dónde te gustaría ir de viaje?",o:["Playa","Montaña","Ciudad grande","Pueblito tranquilo"]},
+{c:"Planes",q:"¿Cómo es tu cita ideal?",o:["Cena elegante","Picnic o parque","Cine y palomitas","Aventura sorpresa"]},
+{c:"Planes",q:"¿Qué estación del año prefieres?",o:["Primavera","Verano","Otoño","Invierno"]},
+{c:"Personalidad",q:"¿Eres más de…?",o:["Madrugar","Trasnochar","Depende del día","Dormir todo el día"]},
+{c:"Personalidad",q:"¿Qué te da más miedo?",o:["Las alturas","Los bichos","La oscuridad","Quedarme sin batería"]},
+{c:"Personalidad",q:"¿Cuál es tu superpoder soñado?",o:["Volar","Leer mentes","Ser invisible","Teletransportarme"]},
+{c:"Personalidad",q:"Cuando discutimos, yo suelo…",o:["Hablar de inmediato","Necesitar un rato a solas","Hacer un chiste","Darte un abrazo"]},
+{c:"Amor",q:"¿Cómo prefieres recibir cariño?",o:["Palabras bonitas","Abrazos y mimos","Detalles y regalos","Tiempo juntos"]},
+{c:"Amor",q:"¿Qué te hace reír más de mí?",o:["Mis chistes","Mis caras","Mis torpezas","Mis historias"]},
+{c:"Amor",q:"¿Qué canción nos representa mejor?",o:["Una romántica","Una bailable","Una nostálgica","Una loca"]},
+{c:"Locuras",q:"Si ganáramos la lotería, lo primero sería…",o:["Viajar","Comprar una casa","Adoptar muchos gatos","Ahorrar todo"]},
+{c:"Locuras",q:"¿Qué tipo de gato serías?",o:["El dormilón","El travieso","El elegante","El glotón"]},
+{c:"Locuras",q:"Si estamos perdidos en una isla, yo soy quien…",o:["Organiza todo","Busca comida","Hace reír","Duerme bajo una palmera"]}
+];
+const T=[
+"Cuéntame tu recuerdo favorito de nosotros.",
+"¿Qué es algo que siempre quisiste hacer y aún no has hecho?",
+"¿Cuál fue tu primera impresión de mí?",
+"¿Qué sueño tienes para dentro de cinco años?",
+"Dime algo que admires de mí y que nunca te he dicho.",
+"¿Cuál sería el nombre de nuestro gato perfecto? Discutan.",
+"¿Qué hábito mío te parece más adorable?"
+];
+const $=id=>document.getElementById(id);
+const sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const MOUTH={happy:"M75 85 Q69 94 62 89 M75 85 Q81 94 88 89",sad:"M75 88 Q69 82 62 88 M75 88 Q81 82 88 88",open:"M68 88 Q75 100 82 88Z"};
+const mood=m=>$("mouth").setAttribute("d",MOUTH[m]);
+const show=id=>["s-home","s-lobby","s-game","s-end"].forEach(s=>$(s).classList.toggle("hide",s!==id));
+let mode="local",S=null,me=null,room=null,sel=null,selKey="",myName="",helloT=null;
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  mode=t.dataset.m;
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));
+  $("w2").classList.toggle("hide",mode!=="local");$("wc").classList.toggle("hide",mode!=="join");
+  $("l1").textContent=mode==="local"?"Jugador/a 1":"Tu nombre";
+  $("start").textContent=mode==="local"?"Empezar a jugar":mode==="host"?"Crear sala":"Unirme a la sala";
+  $("msg").textContent="";
+});
+
+function newState(n0,n1){
+  const qs=sh(Q.map((_,k)=>k)).slice(0,10), ts=sh(T.map((_,k)=>k)).slice(0,3), d=[];
+  qs.forEach((q,k)=>{d.push({t:"q",id:q});if(k===2||k===5||k===8)d.push({t:"talk",id:ts.shift()});});
+  const s={deck:d,i:0,ph:"",a:0,ans:null,guess:null,pts:[0,0],pl:[0,0],names:[n0,n1]};enter(s);return s;
+}
+function enter(s){
+  s.ans=null;s.guess=null;
+  if(s.deck[s.i].t==="talk")s.ph="talk";else{s.ph="pick";s.a=s.pl[0]<=s.pl[1]?0:1;}
+}
+function apply(a){
+  if(!S||a.i!==S.i)return false;
+  if(a.t==="pick"&&S.ph==="pick"){S.ans=a.k;S.ph="guess";}
+  else if(a.t==="guess"&&S.ph==="guess"){S.guess=a.k;S.pl[S.a]++;if(a.k===S.ans)S.pts[1-S.a]++;S.ph="rev";}
+  else if(a.t==="next"&&(S.ph==="rev"||S.ph==="talk")){S.i++;if(S.i>=S.deck.length)S.ph="end";else enter(S);}
+  else return false;
+  return true;
+}
+function act(a){
+  a.i=S.i;
+  if(mode==="join"){if(room)room.emit("g",a);return;}
+  if(apply(a)){broadcast();draw();}
+}
+function broadcast(){if(S&&room&&mode==="host")room.emit("g",{t:"state",s:S});}
+
+function optsHtml(rev,on){
+  return '<div class="opts">'+Q[S.deck[S.i].id].o.map((o,k)=>{
+    let c="opt";if(rev){if(k===S.ans)c+=" ok";else if(k===S.guess)c+=" no";}
+    return `<button class="${c}" data-k="${k}"${on?"":" disabled"}>${o}</button>`;}).join("")+'</div>';
+}
+function draw(){
+  if(S.ph==="end")return finish();
+  show("s-game");
+  const d=S.deck[S.i], n=$("next"), box=$("box"), nm=S.names;
+  $("prog").textContent=`Carta ${S.i+1} de ${S.deck.length}`;
+  $("sc").textContent=`🐾 ${nm[0]} ${S.pts[0]} · ${nm[1]} ${S.pts[1]}`;
+  $("bar").style.width=(S.i/S.deck.length*100)+"%";
+  n.hidden=false;n.disabled=false;
+  if(d.t==="talk"){
+    box.className="card center";mood("happy");
+    box.innerHTML=`<span class="tag">Charla de gatitos</span><h2>${T[d.id]}</h2><p>Respondan los dos en voz alta. Aquí no hay puntos, solo ronroneos.</p>`;
+    n.textContent="Ya hablamos, ¡siguiente!";n.onclick=()=>act({t:"next"});return;
+  }
+  const q=Q[d.id], a=S.a, g=1-a, key=S.i+S.ph;
+  if(key!==selKey){selKey=key;sel=null;}
+  box.className="card";
+  const tag=`<span class="tag">${q.c}</span>`;
+  if(S.ph==="rev"){
+    const ok=S.guess===S.ans;mood(ok?"happy":"sad");
+    box.innerHTML=`${tag}<h2>${q.q}</h2>${optsHtml(true,false)}<p style="margin:16px 0 0;text-align:center;color:var(--ink)"><b>${ok?`¡Miau! ${nm[g]} acertó, +1 patita 🐾`:`Uy, casi. ${nm[a]}, cuéntale por qué elegiste eso.`}</b></p>`;
+    n.textContent=S.i+1<S.deck.length?"Siguiente carta":"Ver resultado";n.onclick=()=>act({t:"next"});return;
+  }
+  const actor=S.ph==="pick"?a:g, mine=me===null||me===actor;
+  mood(S.ph==="guess"?"open":"happy");
+  if(!mine){
+    n.hidden=true;
+    box.innerHTML=`${tag}<h2>${q.q}</h2><p style="text-align:center;margin:0">${S.ph==="pick"?`${nm[a]} está eligiendo su respuesta…`:`${nm[g]} está adivinando…`} 🐾</p>`;return;
+  }
+  const head=S.ph==="pick"
+    ?(me===null?`Responde ${nm[a]} · ${nm[g]} no mira 🙈`:`Tu turno: elige tu respuesta`)
+    :(me===null?`Pásale el celular a ${nm[g]} 🔮`:`Adivina: ¿qué respondió ${nm[a]}?`);
+  box.innerHTML=`${tag}<p class="who" style="margin-bottom:4px">${head}</p><h2>${q.q}</h2>${optsHtml(false,true)}`;
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    sel=+b.dataset.k;box.querySelectorAll(".opt").forEach(x=>x.classList.toggle("sel",x===b));n.disabled=false;});
+  n.textContent=S.ph==="pick"?(me===null?"Listo, pasar el celular":"Enviar respuesta"):"¡Esa es mi respuesta!";
+  n.disabled=true;n.onclick=()=>{if(sel!==null)act({t:S.ph,k:sel});};
+}
+function finish(){
+  show("s-end");
+  const tot=S.pts[0]+S.pts[1], max=S.deck.filter(x=>x.t==="q").length, r=tot/max;
+  let t,p;
+  if(r>=.7){t="¡Almas gemelas felinas!";p="Se conocen como dos gatos que comparten la misma manta. Impresionante."}
+  else if(r>=.4){t="Dúo de gatitos curiosos";p="Se conocen bastante y todavía tienen mucho por descubrir. Sigan jugando."}
+  else{t="Gatitos en exploración";p="¡Qué bueno! Hoy aprendieron muchas cosas nuevas el uno del otro."}
+  $("endT").textContent=t;$("endP").textContent=p;
+  $("endPaws").textContent="🐾".repeat(Math.max(1,Math.round(r*5)));
+  $("endS").innerHTML=S.names.map((n,k)=>`<div>${n}<b>${S.pts[k]}</b>aciertos</div>`).join("");
+  mood(r>=.4?"happy":"open");
+}
+
+function wire(){
+  room.on("g",m=>{
+    const d=m.data||{};if(m.isMe)return;
+    if(mode==="host"){
+      if(d.t==="hello"){if(!S)S=newState(myName,String(d.n||"Michi").slice(0,14));broadcast();draw();}
+      else if(["pick","guess","next"].includes(d.t)&&apply(d)){broadcast();draw();}
+    }else if(d.t==="state"&&d.s){clearInterval(helloT);S=d.s;draw();}
+  });
+}
+$("start").onclick=async()=>{
+  const n1=$("n1").value.trim(), msg=$("msg");
+  if(mode==="local"){mode="local";me=null;S=newState(n1||"Michi 1",$("n2").value.trim()||"Michi 2");draw();return;}
+  myName=n1||"Michi";
+  let code=mode==="join"?$("code").value.trim().toLowerCase().replace(/[^a-z]/g,""):
+    Array.from({length:4},()=>"abcdefghjkmnpqrstuvwxyz"[Math.floor(Math.random()*23)]).join("");
+  if(code.length!==4){msg.textContent="Escribe el código de 4 letras que te dio tu pareja.";return;}
+  msg.textContent="Conectando…";
+  try{
+    const R=window.claude?await window.claude.use("room"):null;
+    if(!R)throw new Error("no");
+    room=await R.join("sala-"+code);
+  }catch(e){msg.textContent="No se pudo abrir la sala. Ambos deben abrir este enlace con sesión iniciada y permiso de colaborador. Mientras tanto, juega en un solo celular.";return;}
+  me=mode==="host"?0:1;wire();show("s-lobby");$("codeT").textContent=code.toUpperCase();
+  if(mode==="host"){$("lobbyT").textContent="Sala creada";$("lobbyP").textContent="Pásale este código a tu pareja. El juego empieza solo cuando entre.";}
+  else{$("lobbyT").textContent="Entrando a la sala…";$("lobbyP").textContent="Esperando al anfitrión.";
+    const hi=()=>room.emit("g",{t:"hello",n:myName});hi();helloT=setInterval(hi,2500);}
+};
+$("again").onclick=()=>location.reload();
+</script>
+</body>
+</html>
