@@ -89,10 +89,16 @@ label{display:block;text-align:left}
     <input id="n2" maxlength="14" placeholder="El nombre de tu pareja" autocomplete="off"></div>
     <div id="wc" class="hide"><label for="code" class="who">Código de la sala</label>
     <input id="code" maxlength="4" placeholder="ABCD" autocomplete="off" style="text-transform:uppercase"></div>
+    <div id="wl"><label class="who">Duración del juego</label>
+    <div class="tabs">
+      <button class="tab on" data-n="10">Rápido · 10</button>
+      <button class="tab" data-n="20">Normal · 20</button>
+      <button class="tab" data-n="35">Maratón · 35</button>
+    </div></div>
     <div style="text-align:center;margin-top:6px"><button class="btn" id="start">Empezar a jugar</button></div>
     <p id="msg"></p>
   </div>
-  <p style="margin-top:16px;font-size:.92rem">Con dos celulares: una persona crea la sala y la otra entra con el código. Las dos deben abrir este mismo enlace con su sesión de Claude iniciada.</p>
+  <p style="margin-top:16px;font-size:.92rem">Con dos celulares: una persona crea la sala y la otra entra con el código. No necesitan cuenta.</p>
 </section>
 
 <!-- Sala de espera -->
@@ -143,7 +149,23 @@ const Q=[
 {c:"Amor",q:"¿Qué canción nos representa mejor?",o:["Una romántica","Una bailable","Una nostálgica","Una loca"]},
 {c:"Locuras",q:"Si ganáramos la lotería, lo primero sería…",o:["Viajar","Comprar una casa","Adoptar muchos gatos","Ahorrar todo"]},
 {c:"Locuras",q:"¿Qué tipo de gato serías?",o:["El dormilón","El travieso","El elegante","El glotón"]},
-{c:"Locuras",q:"Si estamos perdidos en una isla, yo soy quien…",o:["Organiza todo","Busca comida","Hace reír","Duerme bajo una palmera"]}
+{c:"Locuras",q:"Si estamos perdidos en una isla, yo soy quien…",o:["Organiza todo","Busca comida","Hace reír","Duerme bajo una palmera"]},
+{c:"Comida",q:"¿Qué comida nunca volverías a probar?",o:["Mariscos","Picante extremo","Verduras raras","Comida muy dulce"]},
+{c:"Comida",q:"¿Cómo te gusta más la pizza?",o:["Clásica con queso","Con piña (sí, en serio)","Con mucha carne","Vegetariana"]},
+{c:"Comida",q:"¿Qué snack es tu debilidad?",o:["Papas fritas","Palomitas","Galletas o chocolates","Fruta o frutos secos"]},
+{c:"Gustos",q:"¿Qué prefieres para relajarte?",o:["Un libro","Videojuegos","Música","Redes sociales"]},
+{c:"Gustos",q:"¿Qué tipo de serie te atrapa más?",o:["Drama","Comedia","Misterio o crimen","Fantasía o anime"]},
+{c:"Gustos",q:"¿Qué prefieres: mar o montaña?",o:["Mar, sin duda","Montaña, sin duda","Ambos, depende del día","Mejor una piscina"]},
+{c:"Planes",q:"¿Qué harías en un día libre sin planes?",o:["Salir a explorar","Quedarme en casa","Ver a mis amigos","Probar algo nuevo"]},
+{c:"Planes",q:"¿Cómo celebrarías mejor tu cumpleaños?",o:["Fiestón con todos","Cena íntima","Viaje sorpresa","Día tranquilo en casa"]},
+{c:"Planes",q:"Para viajar, prefieres…",o:["Ir con todo planeado","Improvisar sobre la marcha","Un poco de ambos","Que otra persona decida"]},
+{c:"Personalidad",q:"¿Qué te hace enojar más rápido?",o:["La impuntualidad","El desorden","El ruido","Tener hambre"]},
+{c:"Personalidad",q:"En una fiesta, yo soy…",o:["El alma de la fiesta","El que conversa en un rincón","El que se va temprano","El que se queda hasta el final"]},
+{c:"Personalidad",q:"¿Cómo manejas un mal día?",o:["Hablando con alguien","Durmiendo","Comiendo algo rico","Saliendo a caminar"]},
+{c:"Amor",q:"¿Cuál es mi mejor cualidad?",o:["Mi sentido del humor","Mi paciencia","Mi creatividad","Mi forma de cuidar"]},
+{c:"Amor",q:"Un detalle que te haría muy feliz es…",o:["Una nota escrita a mano","Una cena sorpresa","Un regalo inesperado","Un día solo para ti"]},
+{c:"Locuras",q:"Si fuéramos personajes de una película, seríamos…",o:["Comedia romántica","Aventura épica","Película de terror (¡corran!)","Dibujos animados"]},
+{c:"Locuras",q:"¿Qué talento escondido crees que tengo?",o:["Cantar","Bailar","Cocinar","Ninguno, pero lo intento"]}
 ];
 const T=[
 "Cuéntame tu recuerdo favorito de nosotros.",
@@ -152,18 +174,28 @@ const T=[
 "¿Qué sueño tienes para dentro de cinco años?",
 "Dime algo que admires de mí y que nunca te he dicho.",
 "¿Cuál sería el nombre de nuestro gato perfecto? Discutan.",
-"¿Qué hábito mío te parece más adorable?"
+"¿Qué hábito mío te parece más adorable?",
+"¿Cuál ha sido el día más feliz de tu vida hasta ahora?",
+"¿Qué es lo que más te gusta de cómo nos reímos juntos?",
+"Si pudiéramos viajar mañana, ¿a dónde iríamos y qué haríamos?",
+"¿Qué canción te recuerda a mí y por qué?",
+"¿Qué te daba miedo de niño/a que hoy te hace reír?",
+"Cuéntame algo que te haya costado decirme.",
+"¿Qué aprendiste de ti mismo/a desde que estamos juntos?",
+"¿Cuál es la tradición que te gustaría que tuviéramos?"
 ];
 const $=id=>document.getElementById(id);
 const sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
 const MOUTH={happy:"M75 85 Q69 94 62 89 M75 85 Q81 94 88 89",sad:"M75 88 Q69 82 62 88 M75 88 Q81 82 88 88",open:"M68 88 Q75 100 82 88Z"};
 const mood=m=>$("mouth").setAttribute("d",MOUTH[m]);
 const show=id=>["s-home","s-lobby","s-game","s-end"].forEach(s=>$(s).classList.toggle("hide",s!==id));
-let mode="local",S=null,me=null,room=null,sel=null,selKey="",myName="",helloT=null;
+let N=10,mode="local",S=null,me=null,room=null,sel=null,selKey="",myName="",helloT=null;
 
-document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
-  mode=t.dataset.m;
-  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));
+document.querySelectorAll(".tab[data-n]").forEach(t=>t.onclick=()=>{
+  N=+t.dataset.n;document.querySelectorAll(".tab[data-n]").forEach(x=>x.classList.toggle("on",x===t));});
+document.querySelectorAll(".tab[data-m]").forEach(t=>t.onclick=()=>{
+  mode=t.dataset.m;$("wl").classList.toggle("hide",mode==="join");
+  document.querySelectorAll(".tab[data-m]").forEach(x=>x.classList.toggle("on",x===t));
   $("w2").classList.toggle("hide",mode!=="local");$("wc").classList.toggle("hide",mode!=="join");
   $("l1").textContent=mode==="local"?"Jugador/a 1":"Tu nombre";
   $("start").textContent=mode==="local"?"Empezar a jugar":mode==="host"?"Crear sala":"Unirme a la sala";
@@ -171,8 +203,8 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
 });
 
 function newState(n0,n1){
-  const qs=sh(Q.map((_,k)=>k)).slice(0,10), ts=sh(T.map((_,k)=>k)).slice(0,3), d=[];
-  qs.forEach((q,k)=>{d.push({t:"q",id:q});if(k===2||k===5||k===8)d.push({t:"talk",id:ts.shift()});});
+  const qs=sh(Q.map((_,k)=>k)).slice(0,N), ts=sh(T.map((_,k)=>k)), d=[];
+  qs.forEach((q,k)=>{d.push({t:"q",id:q});if((k+1)%3===0&&k<N-1&&ts.length)d.push({t:"talk",id:ts.shift()});});
   const s={deck:d,i:0,ph:"",a:0,ans:null,guess:null,pts:[0,0],pl:[0,0],names:[n0,n1]};enter(s);return s;
 }
 function enter(s){
@@ -187,12 +219,27 @@ function apply(a){
   else return false;
   return true;
 }
+const FB="https://miau-pareja-default-rtdb.firebaseio.com/:"; // ejemplo: https://miau-12345-default-rtdb.firebaseio.com
+let code="",pollT=null,lastS="",lastA="",seq=0,busy=false;
+const api=(path,method="GET",body)=>fetch(`${FB.replace(/\/$/,"")}/rooms/${code}${path}.json`,
+  {method,headers:{"Content-Type":"application/json"},body:body===undefined?undefined:JSON.stringify(body)})
+  .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()});
 function act(a){
   a.i=S.i;
-  if(mode==="join"){if(room)room.emit("g",a);return;}
+  if(mode==="join"){a.q=Date.now()+"-"+(++seq);api("/a","PUT",a).catch(()=>{});return;}
   if(apply(a)){broadcast();draw();}
 }
-function broadcast(){if(S&&room&&mode==="host")room.emit("g",{t:"state",s:S});}
+function broadcast(){if(S&&code&&mode==="host")api("/s","PUT",JSON.stringify(S)).catch(()=>{});}
+function poll(){
+  if(busy)return;busy=true;
+  api("").then(d=>{
+    busy=false;if(!d)return;
+    if(mode==="host"){
+      if(d.h&&!S){S=newState(myName,String(d.h.n||"Michi").slice(0,14));broadcast();draw();}
+      if(d.a&&d.a.q!==lastA){lastA=d.a.q;if(apply(d.a)){broadcast();draw();}}
+    }else if(d.s&&d.s!==lastS){lastS=d.s;S=JSON.parse(d.s);draw();}
+  }).catch(()=>{busy=false});
+}
 
 function optsHtml(rev,on){
   return '<div class="opts">'+Q[S.deck[S.i].id].o.map((o,k)=>{
@@ -249,34 +296,29 @@ function finish(){
   mood(r>=.4?"happy":"open");
 }
 
-function wire(){
-  room.on("g",m=>{
-    const d=m.data||{};if(m.isMe)return;
-    if(mode==="host"){
-      if(d.t==="hello"){if(!S)S=newState(myName,String(d.n||"Michi").slice(0,14));broadcast();draw();}
-      else if(["pick","guess","next"].includes(d.t)&&apply(d)){broadcast();draw();}
-    }else if(d.t==="state"&&d.s){clearInterval(helloT);S=d.s;draw();}
-  });
-}
 $("start").onclick=async()=>{
   const n1=$("n1").value.trim(), msg=$("msg");
-  if(mode==="local"){mode="local";me=null;S=newState(n1||"Michi 1",$("n2").value.trim()||"Michi 2");draw();return;}
-  myName=n1||"Michi";
-  let code=mode==="join"?$("code").value.trim().toLowerCase().replace(/[^a-z]/g,""):
-    Array.from({length:4},()=>"abcdefghjkmnpqrstuvwxyz"[Math.floor(Math.random()*23)]).join("");
-  if(code.length!==4){msg.textContent="Escribe el código de 4 letras que te dio tu pareja.";return;}
-  msg.textContent="Conectando…";
+  if(mode==="local"){me=null;S=newState(n1||"Michi 1",$("n2").value.trim()||"Michi 2");draw();return;}
+  if(FB.startsWith("PEGA_")){msg.textContent="Falta configurar la base de datos (ver el comienzo del código).";return;}
+  myName=n1||"Michi";msg.textContent="Conectando…";
   try{
-    const R=window.claude?await window.claude.use("room"):null;
-    if(!R)throw new Error("no");
-    room=await R.join("sala-"+code);
-  }catch(e){msg.textContent="No se pudo abrir la sala. Ambos deben abrir este enlace con sesión iniciada y permiso de colaborador. Mientras tanto, juega en un solo celular.";return;}
-  me=mode==="host"?0:1;wire();show("s-lobby");$("codeT").textContent=code.toUpperCase();
-  if(mode==="host"){$("lobbyT").textContent="Sala creada";$("lobbyP").textContent="Pásale este código a tu pareja. El juego empieza solo cuando entre.";}
-  else{$("lobbyT").textContent="Entrando a la sala…";$("lobbyP").textContent="Esperando al anfitrión.";
-    const hi=()=>room.emit("g",{t:"hello",n:myName});hi();helloT=setInterval(hi,2500);}
+    if(mode==="host"){
+      do{code=Array.from({length:4},()=>"abcdefghjkmnpqrstuvwxyz"[Math.floor(Math.random()*23)]).join("");}while(await api(""));
+      await api("","PUT",{c:Date.now()});me=0;
+      $("lobbyT").textContent="Sala creada";$("lobbyP").textContent="Pásale este código a tu pareja. El juego empieza solo cuando entre.";
+    }else{
+      code=$("code").value.trim().toLowerCase().replace(/[^a-z]/g,"");
+      if(code.length!==4){msg.textContent="Escribe el código de 4 letras que te dio tu pareja.";return;}
+      if(!(await api(""))){msg.textContent="No encontré esa sala. Revisa el código.";return;}
+      await api("/h","PUT",{n:myName,t:Date.now()});me=1;
+      $("lobbyT").textContent="Entrando a la sala…";$("lobbyP").textContent="Esperando al anfitrión.";
+    }
+  }catch(e){msg.textContent="No se pudo conectar. Revisa tu internet o la configuración de la base de datos.";return;}
+  show("s-lobby");$("codeT").textContent=code.toUpperCase();
+  pollT=setInterval(poll,1000);poll();
 };
 $("again").onclick=()=>location.reload();
 </script>
 </body>
 </html>
+
