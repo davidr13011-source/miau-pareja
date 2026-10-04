@@ -219,7 +219,7 @@ function apply(a){
   else return false;
   return true;
 }
-const FB="https://miau-pareja-default-rtdb.firebaseio.com/:"; // ejemplo: https://miau-12345-default-rtdb.firebaseio.com
+const FB="https://miau-pareja-default-rtdb.firebaseio.com"; // ejemplo: https://miau-12345-default-rtdb.firebaseio.com
 let code="",pollT=null,lastS="",lastA="",seq=0,busy=false;
 const api=(path,method="GET",body)=>fetch(`${FB.replace(/\/$/,"")}/rooms/${code}${path}.json`,
   {method,headers:{"Content-Type":"application/json"},body:body===undefined?undefined:JSON.stringify(body)})
